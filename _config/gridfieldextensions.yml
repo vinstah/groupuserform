@@ -1,7 +1,0 @@
----
-name: gridfieldaddgroupedfields
----
-GridFieldAddNewMultiClass:
-  showEmptyString: true
-Injector:
-  UserFormFieldEditorExtension: UserFormGroupedFieldsExtension

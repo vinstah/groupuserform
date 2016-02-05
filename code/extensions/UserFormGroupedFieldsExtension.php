@@ -1,13 +1,13 @@
 <?php
 
 class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
-	public function updateCMSFields(FieldList $fields) {
 
+	public function updateCMSFields(FieldList $fields) {
 		$fieldEditor = $this->getFieldEditorGrid();
-		// $fields->removeFieldFromTab('Root.FormFields','Fields');
-		// $fields->findOrMakeTab('Root.FormFields');
+
 		$fields->insertAfter(new Tab('FormFields', _t('UserFormFieldEditorExtension.FORMFIELDS', 'Form Fields')), 'Main');
 		$fields->addFieldToTab('Root.FormFields', $fieldEditor);
+
 		return $fields;
 	}
 	/**
@@ -20,8 +20,6 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 
 		$fields = $this->owner->Fields();
 
-		// $this->createInitialFormStep(true);
-		//
 		$editableColumns = new GridFieldEditableColumns();
 		$fieldClasses = singleton('EditableFormField')->getEditableFieldClasses();
 		$editableColumns->setDisplayFields(array(
@@ -36,16 +34,11 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 				}
 			}
 		));
-		// if (Config::inst()->get('UserFormGroupedFieldsExtension', 'showAddGroup')) {
-			// $addFieldAction = new GridFieldAddNewMultiClass('buttons-before-right');
-			$addFieldAction = new GridFieldAddNewGroupedFields('buttons-before-right');
-			$config = GridFieldConfig::create()
-				->addComponent($addFieldAction);
-		// }
 
-		$config
+		$config = GridFieldConfig::create()
 			->addComponents(
 				$editableColumns,
+				new GridFieldAddGroupedFields('buttons-before-right'),
 				new GridFieldButtonRow(),
 				GridFieldAddClassesButton::create('EditableTextField')
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_FIELD', 'Add Field'))
@@ -54,6 +47,7 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_PAGE_BREAK', 'Add Page Break')),
 				GridFieldAddClassesButton::create(array('EditableFieldGroup', 'EditableFieldGroupEnd'))
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_FIELD_GROUP', 'Add Field Group')),
+
 				new GridFieldEditButton(),
 				new GridFieldDeleteAction(),
 				new GridFieldToolbarHeader(),
@@ -62,20 +56,13 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 			);
 
 		$fieldEditor = GridField::create(
-			'GroupedFields',
+			'Fields',
 			_t('UserDefinedForm.FIELDS', 'Fields'),
 			$fields,
 			$config
 		)->addExtraClass('uf-field-editor');
 
-		// if (Config::inst()->get('UserFormFieldEditorExtension', 'showAddEdit')) {
-			$addFieldAction->setTitle('Add Field Block');
-			$fields = $addFieldAction->getClasses($fieldEditor);
-			$fields = array_diff_key($fields, array_flip(array('EditableFormStep', 'EditableFieldGroup', 'EditableFieldGroupEnd')));
-			asort($fields);
-			$addFieldAction->setClasses($fields);
-		// }
-
 		return $fieldEditor;
 	}
+
 }

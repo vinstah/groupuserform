@@ -5,7 +5,7 @@
  * By default the list of classes that are createable is the grid field's model class, and any
  * subclasses. This can be customised using {@link setClasses()}.
  */
-class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_URLHandler {
+class GridFieldAddGroupedFields implements GridField_HTMLProvider, GridField_URLHandler {
 
 	private static $allowed_actions = array(
 		'handleAdd'
@@ -22,12 +22,10 @@ class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_
 
 	private $defaultClass;
 
-	private $groupedFieldsJson;
-
 	/**
 	 * @var string
 	 */
-	protected $itemRequestClass = 'GridFieldAddNewMultiClassHandler';
+	protected $itemRequestClass = 'GridFieldAddGroupedFieldsHandler';
 
 	/**
 	 * @param string $fragment the fragment to render the button in
@@ -35,10 +33,6 @@ class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_
 	public function __construct($fragment = 'before') {
 		$this->setFragment($fragment);
 		$this->setTitle(_t('GridFieldExtensions.ADD', 'Add'));
-
-		if(file_exists(GROUPEDFIELDS_DIR . '/groupedFields.json')) {
-			$this->groupedFieldsJson = file_get_contents(GROUPEDFIELDS_DIR . '/groupedFields.json');
-		}
 	}
 
 	/**
@@ -82,6 +76,14 @@ class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_
 	}
 
 	/**
+	 * Loads all the groups from GroupedFields
+	 * @uses GroupedFields
+	 * @return array fields mapped as ClassName => Title
+	 */
+	public function getGroups(){
+		return GroupedFields::get()->map();
+	}
+	/**
 	 * Gets the classes that can be created using this button, defaulting to the model class and
 	 * its subclasses.
 	 *
@@ -122,73 +124,32 @@ class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_
 	 * @param SS_HTTPRequest $request
 	 * @return GridFieldAddNewMultiClassHandler
 	 */
-
 	public function handleAdd($grid, $request) {
-		$group = $request->param('ClassName');
-		$groupedFields = $this->findGroupedFieldsByID($group);
-		if(empty($groupedFields)) {
-			throw new SS_HTTPResponse_Exception(400);
-		}
-		// var_dump($groupedFields);
-		$classes = array_values(ClassInfo::subclassesFor('EditableFormField'));
-		// Add item to gridfield
-		$list = $grid->getList();
-		foreach($groupedFields as $field){
-			$item = $field['type']::create();
-			$item->Title = $field['title'];
-			$item->write();
-			$list->add($item);
-		}
 
+		$class     = $request->param('ClassName');
+		$classes   = $this->getClasses($grid);
+		$component = $grid->getConfig()->getComponentByType('GridFieldDetailForm');
 
+		$addGroup = $request->param('ClassName');
+		$group = GroupedFields::get()->filter('ID', $addGroup);
+		if($group->exists()) {
+			$groupedFields = $group->First()->Fields();
+			if($groupedFields->exists()){
+				$list = $grid->getList();
+
+				foreach($groupedFields as $field) {
+					$class = $field->ClassName;
+					$item = $class::create();
+					$item->Title = $field->Title;
+					$item->write();
+					$list->add($field);
+				}
+			}
 		// Should trigger a simple reload
 		return Controller::curr()->redirectBack();
-	}
 
-	/**
-	 * Find the group by requested group ID in groupedFieldsJson
-	 * @param (string) $groupID
-	 * @return array
-	 *
-	 */
-
-	 public function findGroupedFieldsByID($groupID) {
-		$questionsArray = array();
-		if(array_key_exists($groupID, $this->getGroups())) {
-			$json = json_decode($this->groupedFieldsJson, true);
-	 		if(is_array($json)) {
-
-	 			foreach($json['groups'] as $key => $group) {
-					if($group['id'] == $groupID) {
-						$questionsArray = $group['questions'];
-					}
-				}
-
-				$questionFields = array();
-				foreach($questionsArray as $k => $question) {
-					$questionFields[] = $question['type'];
-				}
-
-				// return $questionFields;
-	 		}
 		}
-		return $questionsArray;
-
-	 }
-	 /**
-	  * Get groups for dropdown list
-	  *
-	  */
-	 public function getGroups() {
- 		$json = json_decode($this->groupedFieldsJson, true);
- 		$groups = array();
-  		if(is_array($json)) {
- 			foreach($json['groups'] as $key => $group){
- 				$groups[$group['id']] = $group['title'];
- 			}
- 		}
- 		return $groups;
- 	}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -210,23 +171,21 @@ class GridFieldAddNewGroupedFields implements GridField_HTMLProvider, GridField_
 
 		$data = new ArrayData(array(
 			'Title'      => $this->getTitle(),
-			'Link'       => Controller::join_links($grid->Link(), 'add-multi-class', '{class}'),
+			'Link'       => Controller::join_links($grid->Link(), 'add-grouped-fields', '{class}'),
 			'ClassField' => $field
 		));
 
 		return array(
-			$this->getFragment() => $data->renderWith('GridFieldAddNewMultiClass')
+			$this->getFragment() => $data->renderWith(__CLASS__)
 		);
 	}
-
-
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getURLHandlers($grid) {
 		return array(
-			'add-multi-class/$ClassName!' => 'handleAdd'
+			'add-grouped-fields/$ClassName!' => 'handleAdd'
 		);
 	}
 
