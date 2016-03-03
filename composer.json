@@ -1,6 +1,6 @@
 
 {
-	"name": "vinstah/userform_groupedfields",
+	"name": "vinstah/groupuserform",
 	"description": "adds ability to group userform fields for reuse on UserDefinedForm",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "userforms", "groupedfields"],
