@@ -1,0 +1,21 @@
+
+{
+	"name": "vinstah/userform_groupedfields",
+	"description": "adds ability to group userform fields for reuse on UserDefinedForm",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "userforms", "groupedfields"],
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Vinnie Watson",
+			"email": "vinstah@gmail.com"
+		}
+	],
+	"require": {
+		"silverstripe/framework": "~3.1",
+		"silverstripe/cms": "~3.1",
+		"silverstripe-australia/gridfieldextensions": "~1.1",
+		"silverstripe/segment-field": "^1.0",
+		"silverstripe/userforms": "~3.0"
+	}
+}
