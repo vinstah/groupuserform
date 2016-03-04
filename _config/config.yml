@@ -3,6 +3,3 @@ Injector:
 EdtitableFormField:
   extensions:
    - EditableFormFieldExtension
-Group:
-  extensions:
-   - UserFormFieldEditorExtension
