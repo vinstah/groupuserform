@@ -46,20 +46,12 @@ class GroupedFields extends DataObject {
 		));
 
 		$config = GridFieldConfig::create()
-			->addComponent($editableColumns);
-
-		if (Config::inst()->get('UserFormFieldEditorExtension', 'showAddEdit')) {
-			$addFieldAction = new GridFieldAddNewMultiClass('buttons-before-right');
-
-			$config
-				->addComponent($addFieldAction);
-		}
-
-		$config
 			->addComponents(
+				$editableColumns,
 				new GridFieldButtonRow(),
-				GridFieldAddClassesButton::create('EditableFormField')
-					->setButtonName('Add Field'),
+				GridFieldAddClassesButton::create('EditableTextField')
+					->setButtonName(_t('UserFormFieldEditorExtension.ADD_FIELD', 'Add Field'))
+					->setButtonClass('ss-ui-action-constructive'),
 				GridFieldAddClassesButton::create('EditableFormStep')
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_PAGE_BREAK', 'Add Page Break')),
 				GridFieldAddClassesButton::create(array('EditableFieldGroup', 'EditableFieldGroupEnd'))
@@ -67,7 +59,7 @@ class GroupedFields extends DataObject {
 				new GridFieldEditButton(),
 				new GridFieldDeleteAction(),
 				new GridFieldToolbarHeader(),
-				new GridFieldOrderableRows('Sort'),
+				// new GridFieldOrderableRows('Sort'),
 				new GridFieldDetailForm()
 			);
 
@@ -78,7 +70,7 @@ class GroupedFields extends DataObject {
 			$config
 		)->addExtraClass('uf-field-editor');
 
-			if (Config::inst()->get('UserFormFieldEditorExtension', 'showAddEdit')) {
+		if (Config::inst()->get('UserFormFieldEditorExtension', 'showAddEdit')) {
 			$addFieldAction->setTitle(_t('UserFormFieldEditorExtension.ADD_EDIT_FIELD', 'Add & Edit Field'));
 
 			$fields = $addFieldAction->getClasses($fieldEditor);
@@ -86,7 +78,6 @@ class GroupedFields extends DataObject {
 			asort($fields);
 			$addFieldAction->setClasses($fields);
 		}
-
 		return $fieldEditor;
 	}
 }

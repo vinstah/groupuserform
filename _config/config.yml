@@ -1,5 +1,8 @@
 Injector:
   UserFormFieldEditorExtension: UserFormGroupedFieldsExtension
 EdtitableFormField:
-  extensions: 
-   - EdtitableFormFieldExtension
+  extensions:
+   - EditableFormFieldExtension
+Group:
+  extensions:
+   - UserFormFieldEditorExtension

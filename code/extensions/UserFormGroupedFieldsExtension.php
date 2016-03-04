@@ -2,14 +2,6 @@
 
 class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 
-	public function updateCMSFields(FieldList $fields) {
-		$fieldEditor = $this->getFieldEditorGrid();
-
-		$fields->insertAfter(new Tab('FormFields', _t('UserFormFieldEditorExtension.FORMFIELDS', 'Form Fields')), 'Main');
-		$fields->addFieldToTab('Root.FormFields', $fieldEditor);
-
-		return $fields;
-	}
 	/**
 	 * Gets the field editor, for adding and removing EditableFormFields.
 	 *
@@ -19,6 +11,8 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 		Requirements::javascript(USERFORMS_DIR . '/javascript/FieldEditor.js');
 
 		$fields = $this->owner->Fields();
+
+		$this->createInitialFormStep(true);
 
 		$editableColumns = new GridFieldEditableColumns();
 		$fieldClasses = singleton('EditableFormField')->getEditableFieldClasses();
@@ -47,7 +41,6 @@ class UserFormGroupedFieldsExtension extends UserFormFieldEditorExtension {
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_PAGE_BREAK', 'Add Page Break')),
 				GridFieldAddClassesButton::create(array('EditableFieldGroup', 'EditableFieldGroupEnd'))
 					->setButtonName(_t('UserFormFieldEditorExtension.ADD_FIELD_GROUP', 'Add Field Group')),
-
 				new GridFieldEditButton(),
 				new GridFieldDeleteAction(),
 				new GridFieldToolbarHeader(),
